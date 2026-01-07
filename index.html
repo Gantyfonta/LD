@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Latin Dictionary</title>
+  <title>Vocab List</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -41,16 +41,10 @@
   <ul id="vocabList"></ul>
 
   <script>
-    // ✏️ EDIT YOUR VOCAB WORDS HERE
-    const vocabWords = [
-     
-    ];
-
     const list = document.getElementById("vocabList");
     const searchInput = document.getElementById("search");
 
-    // Sort words alphabetically (A → Z)
-    const sortedWords = [...vocabWords].sort((a, b) => a.localeCompare(b));
+    let sortedWords = [];
 
     function renderList(words) {
       list.innerHTML = "";
@@ -61,8 +55,17 @@
       });
     }
 
-    // Initial render
-    renderList(sortedWords);
+    // Load words from external file (words.json)
+    fetch("words.json")
+      .then(response => response.json())
+      .then(vocabWords => {
+        sortedWords = [...vocabWords].sort((a, b) => a.localeCompare(b));
+        renderList(sortedWords);
+      })
+      .catch(error => {
+        list.innerHTML = "<li>Failed to load words file.</li>";
+        console.error(error);
+      });
 
     // Live search with similarity ranking
     searchInput.addEventListener("input", () => {
@@ -81,7 +84,6 @@
           if (lower.startsWith(query)) score += 3;
           if (lower.includes(query)) score += 2;
 
-          // similarity based on shared characters
           for (const char of query) {
             if (lower.includes(char)) score += 0.1;
           }
