@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vocab List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 40px;
+    }
+    h1 {
+      text-align: center;
+    }
+    ul {
+      max-width: 400px;
+      margin: 30px auto;
+      padding: 0;
+      list-style: none;
+    }
+    li {
+      background: white;
+      margin-bottom: 10px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Vocabulary Words</h1>
+
+  <input
+    type="text"
+    id="search"
+    placeholder="Search vocab..."
+    style="display:block;margin:20px auto;padding:10px 14px;width:260px;font-size:16px;border-radius:8px;border:1px solid #ccc;"
+  />
+
+  <ul id="vocabList"></ul>
+
+  <script>
+    // ✏️ EDIT YOUR VOCAB WORDS HERE
+    const vocabWords = [
+      "aberration",
+      "benevolent",
+      "candid",
+      "diligent",
+      "eloquent"
+    ];
+
+    const list = document.getElementById("vocabList");
+    const searchInput = document.getElementById("search");
+
+    // Sort words alphabetically (A → Z)
+    const sortedWords = [...vocabWords].sort((a, b) => a.localeCompare(b));
+
+    function renderList(words) {
+      list.innerHTML = "";
+      words.forEach(word => {
+        const li = document.createElement("li");
+        li.textContent = word;
+        list.appendChild(li);
+      });
+    }
+
+    // Initial render
+    renderList(sortedWords);
+
+    // Live search with similarity ranking
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.toLowerCase();
+
+      if (!query) {
+        renderList(sortedWords);
+        return;
+      }
+
+      const results = sortedWords
+        .map(word => {
+          const lower = word.toLowerCase();
+          let score = 0;
+
+          if (lower.startsWith(query)) score += 3;
+          if (lower.includes(query)) score += 2;
+
+          // similarity based on shared characters
+          for (const char of query) {
+            if (lower.includes(char)) score += 0.1;
+          }
+
+          return { word, score };
+        })
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map(item => item.word);
+
+      renderList(results);
+    });
+  </script>
+</body>
+</html>
